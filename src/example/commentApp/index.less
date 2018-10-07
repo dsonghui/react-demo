@@ -1,5 +1,91 @@
 
 .CommentApp {
-  width: 500px;
-  margin: 0 auto;
+    width: 500px;
+    margin: 10px auto;
+    padding: 20px;
+    background: #fff;
+    border: 1px solid #f1f1f1;
+    border-radius: 3px;
+    .CommentInput {
+        padding: 20px;
+        border: 1px solid #f1f1f1;
+        border-radius: 3px;
+    }
+    .CommentList {
+        padding: 20px;
+        border: 1px solid #f1f1f1;
+        border-radius: 3px;
+    }
+
+    .comment-field {
+        display: flex;
+        margin-bottom: 10px;
+        .comment-field-name {
+            flex: 0 1 100px;
+        }
+        .comment-field-input {
+            flex: 1;
+            display: flex;
+            input, & textarea {
+                border: 1px solid #e6e6e6;
+                border-radius: 3px;
+                padding: 5px;
+                outline: none;
+                font-size: 14px;
+                resize: none;
+                -webkit-box-flex: 1;
+                -webkit-flex: 1;
+                -ms-flex: 1;
+                flex: 1;
+            }
+            textarea {
+                height: 100px;
+            }
+        }
+        .comment-field-button {
+            flex: 1;
+            display: flex;
+            justify-content: flex-end;
+            button {
+                border: none;
+                border-radius: 3px;
+                background: #00a3cf;
+                padding: 5px 10px;
+                color: #ffffff;
+                cursor: pointer;
+                outline: none;
+            }
+        }
+    }
+
+    .comment-item {
+        position: relative;
+        display: flex;
+        border-bottom: 1px solid #f1f1f1;
+        margin-bottom: 10px;
+        padding-bottom: 10px;
+        min-height: 50px;
+        .comment-item-name {
+            flex-shrink: 0;
+            span { color: #00a3cf;}
+        }
+        .comment-item-content {
+            flex: 1;
+        }
+        .comment-item-createtime {
+            font-size: 12px;
+            color: #999;
+            position: absolute;
+            right: 0;
+            bottom: 0;
+        }
+        .comment-item-delete {
+            position: absolute;
+            right: 0;
+            top: 0;
+            cursor: pointer;
+            color: #00a3cf;
+            font-size: 14px;
+        }
+    }
 }
