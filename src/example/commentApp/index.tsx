@@ -1,5 +1,7 @@
 import * as React from "react";
+import { Provider, connect } from 'react-redux'
 import './index.less';
+import { createStore } from "redux";
 
 const COMMENTLIST = 'COMMENTLIST';
 const COMMENTLASTNAME = 'COMMENTLASTNAME';
@@ -10,95 +12,6 @@ interface ICommentEntity {
     content: string;
 }
 
-export class CommentManager {
-    comments: ICommentEntity[] = [];
-    constructor() {
-        let comments = [];
-        let commentsString = window.localStorage.getItem(COMMENTLIST);
-        if (commentsString) {
-            comments = JSON.parse(commentsString);
-        }
-        this.comments = comments;
-    }
-
-    addComment(comment: ICommentEntity) {
-        comment.key = new Date().getTime();
-        this.comments.push(comment);
-        this.syncSaveComment();
-    }
-
-    delComment(comment: ICommentEntity) {
-        let index = this.comments.findIndex(item => item.key === comment.key);
-        if (index >= 0) {
-            this.comments.splice(index, 1);
-            this.syncSaveComment();
-        }
-    }
-
-    getComments() {
-        return this.comments;
-    }
-
-    getLastUserName() {
-        return window.localStorage.getItem(COMMENTLASTNAME)
-    }
-
-    saveLastUserName(name) {
-        return window.localStorage.setItem(COMMENTLASTNAME, name)
-    }
-
-    syncSaveComment() {
-        window.localStorage.setItem(COMMENTLIST, JSON.stringify(this.comments));
-    }
-}
-
-const Comment = new CommentManager();
-
-
-export class CommentApp extends React.Component<any, { comments: ICommentEntity[] }> {
-    time: any;
-    constructor(props: any) {
-        super(props);
-        this.state = { comments: Comment.getComments() };
-        this.handleCommentInput = this.handleCommentInput.bind(this);
-        this.handleCommentDelete = this.handleCommentDelete.bind(this);
-    }
-
-    handleCommentInput(name: string, content: string) {
-        Comment.addComment({
-            name,
-            content
-        });
-        this.updateComments();
-    }
-    handleCommentDelete(commnent: ICommentEntity) {
-        Comment.delComment(commnent);
-        this.updateComments();
-    }
-
-    updateComments() {
-        this.setState({
-            comments: Comment.getComments()
-        });
-    }
-
-    componentWillMount() {
-        this.time = setInterval(() => {
-            this.updateComments();
-        }, 5000)
-    }
-
-    componentWillUnmount() {
-        clearInterval(this.time);
-    }
-
-    render() {
-        return <div className="CommentApp">
-            <CommentInput commentInput={this.handleCommentInput}/>
-            <CommentList comments={this.state.comments} commentDelete={this.handleCommentDelete}/>
-        </div>
-    }
-}
 
 interface IPropsCommentInput {
     commentInput(name: string, content: string): any;
@@ -138,6 +51,7 @@ export class CommentInput extends React.Component<IPropsCommentInput, any> {
     }
 
     render() {
+        console.log(this.props);
         return <div className="CommentInput">
             <div className="comment-field">
                 <div className="comment-field-name">用户名：</div>
@@ -163,6 +77,7 @@ export class CommentInput extends React.Component<IPropsCommentInput, any> {
 
 export class CommentList extends React.Component<{ comments: ICommentEntity[], commentDelete(comment): any }, any> {
     render() {
+        console.log(this.props);
         return <div className="CommentList">
             {this.props.comments.map(comment => {
                 return <CommentItem comment={comment} key={comment.key} commentDelete={this.props.commentDelete}/>
@@ -212,5 +127,170 @@ export class CommentItem extends React.Component<any, any> {
             <span className="comment-item-createtime">{this.niceTime}</span>
             <span className="comment-item-delete" onClick={this.handleDelete}>删除</span>
         </div>
+    }
+}
+
+
+export class CommentManager {
+    comments: ICommentEntity[] = [];
+    constructor() {
+        let comments = [];
+        let commentsString = window.localStorage.getItem(COMMENTLIST);
+        if (commentsString) {
+            comments = JSON.parse(commentsString);
+        }
+        this.comments = comments;
+    }
+
+    addComment(comment: ICommentEntity) {
+        comment.key = new Date().getTime();
+        this.comments.push(comment);
+        this.syncSaveComment(this.comments);
+    }
+
+    delComment(comment: ICommentEntity) {
+        let index = this.comments.findIndex(item => item.key === comment.key);
+        if (index >= 0) {
+            this.comments.splice(index, 1);
+            this.syncSaveComment(this.comments);
+        }
+    }
+
+    getComments() {
+        return this.comments;
+    }
+
+    getLastUserName() {
+        return window.localStorage.getItem(COMMENTLASTNAME)
+    }
+
+    saveLastUserName(name) {
+        return window.localStorage.setItem(COMMENTLASTNAME, name)
+    }
+
+    syncSaveComment(comments) {
+        window.localStorage.setItem(COMMENTLIST, JSON.stringify(comments));
+    }
+}
+
+const Comment = new CommentManager();
+
+let preloadedState: any = { comments: Comment.getComments() };
+
+const store = createStore(commentAppReducer, preloadedState);
+
+store.subscribe(() => {
+    Comment.syncSaveComment(store.getState().comments);
+});
+
+
+function commentAppReducer(state: any = { comments: [] }, action: any) {
+    let comments: any = state.comments;
+    switch (action.type) {
+        case 'PUSH_COMMENT':
+            let comment = action.payload;
+            comment.key = new Date().getTime();
+            comments.push(comment);
+            return {
+                comments: comments.map(m => {
+                    return m
+                })
+            };
+        case 'DELETE_COMMENT':
+            let index = comments.findIndex(item => item.key === action.payload);
+            if (index >= 0) {
+                comments.splice(index, 1);
+            }
+            return {
+                comments: comments.map(m => {
+                    return m
+                })
+            };
+        default:
+            return state;
+    }
+}
+
+const mapStateToProps = (state, ownProps) => {
+    return {
+        comments: state.comments
+    }
+};
+
+const mapDispatchToProps = (
+    dispatch,
+    ownProps
+) => {
+    return {
+        commentDelete: (comment: ICommentEntity) => {
+            dispatch({
+                type: 'DELETE_COMMENT',
+                payload: comment.key
+            });
+        },
+        commentInput: (name, content) => {
+            console.log(ownProps);
+            dispatch({
+                type: 'PUSH_COMMENT',
+                payload: { name, content }
+            });
+        }
+    };
+}
+
+const MyCommentList = connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(CommentList);
+const MyCommentInput = connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(CommentInput);
+
+
+export class CommentApp extends React.Component<any, { comments: ICommentEntity[] }> {
+    timer: any;
+    constructor(props: any) {
+        super(props);
+        // this.state = { comments: Comment.getComments() };
+        // this.handleCommentInput = this.handleCommentInput.bind(this);
+        // this.handleCommentDelete = this.handleCommentDelete.bind(this);
+    }
+
+    // handleCommentInput(name: string, content: string) {
+    //     Comment.addComment({
+    //         name,
+    //         content
+    //     });
+    //     this.updateComments();
+    // }
+    // handleCommentDelete(commnent: ICommentEntity) {
+    //     Comment.delComment(commnent);
+    //     this.updateComments();
+    // }
+
+    // updateComments() {
+    //     this.setState({
+    //         comments: Comment.getComments()
+    //     });
+    // }
+
+    // componentWillMount() {
+    //     this.timer = setInterval(() => {
+    //         this.updateComments();
+    //     }, 5000)
+    // }
+
+    componentWillUnmount() {
+        clearInterval(this.timer);
+    }
+
+    render() {
+        return <Provider store={store}>
+            <div className="CommentApp">
+                <MyCommentInput/>
+                <MyCommentList/>
+            </div>
+        </Provider>
     }
 }
