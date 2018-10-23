@@ -1,4 +1,6 @@
 import * as React from 'react';
+import { Route } from 'react-router';
+import { HashRouter } from 'react-router-dom';
 import './index.css';
 import { BallWrap } from "./Ball/BallWrap";
 import { Post } from "./example/Post";
@@ -15,11 +17,13 @@ class App extends React.Component {
         }
     }
     public render() {
-        return <div>
-            {this.app === 'Ball' && <BallWrap/>}
-            {this.app === 'Post' && <Post content="isContent"/>}
-            {this.app === 'Comment' && <CommentApp/>}
-        </div>
+        return <HashRouter>
+            <div>
+                <Route path="/Ball" component={BallWrap}/>
+                <Route path="/Post" component={Post}/>
+                <Route path="/Comment" component={CommentApp}/>
+            </div>
+        </HashRouter>
     }
 }
 
