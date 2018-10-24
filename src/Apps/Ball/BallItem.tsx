@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Ball, windowWrap } from "../lib/Ball";
+import { Ball, windowWrap } from "../../lib/Ball";
 
 interface IProps {
     Wrap: windowWrap

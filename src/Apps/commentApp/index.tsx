@@ -248,7 +248,7 @@ const MyCommentInput = connect(
 )(CommentInput);
 
 
-export class CommentApp extends React.Component<any, { comments: ICommentEntity[] }> {
+export default class CommentApp extends React.Component<any, { comments: ICommentEntity[] }> {
     timer: any;
     constructor(props: any) {
         super(props);

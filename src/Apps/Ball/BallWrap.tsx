@@ -1,13 +1,13 @@
 import * as React from "react";
 import "./App.css";
-import { windowWrap } from "../lib/Ball";
+import { windowWrap } from "../../lib/Ball";
 import { BallItem } from "./BallItem";
 
 interface IState {
     wrap: windowWrap
 }
 
-export class BallWrap extends React.Component<object, IState> {
+export default class BallWrap extends React.Component<object, IState> {
 
     constructor(props: any) {
         super(props);
