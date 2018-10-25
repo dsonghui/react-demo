@@ -1,7 +1,7 @@
 import * as React from "react";
 import { connect } from 'react-redux'
 import './index.less';
-import { createAddCommentsAction, createDeleteCommentAction } from "./store";
+import { createAsyncAddCommentsAction, createDeleteCommentAction } from "./store";
 
 const COMMENTLASTNAME = 'COMMENTLASTNAME';
 
@@ -13,7 +13,7 @@ interface ICommentEntity {
 
 
 interface IPropsCommentInput {
-    commentInput(name: string, content: string): any;
+    commentInput(comment: { name: string, content: string }): any;
 }
 
 
@@ -41,7 +41,8 @@ export class CommentInput extends React.Component<IPropsCommentInput, any> {
 
     handleSubmit(event) {
         event.preventDefault();
-        this.props.commentInput(this.state.name, this.state.content);
+        console.log(this.props.commentInput);
+        this.props.commentInput({ name: this.state.name, content: this.state.content });
         window.localStorage.setItem(COMMENTLASTNAME, this.state.name)
     }
 
@@ -133,10 +134,6 @@ const mapDispatchToProps = (
     return {
         commentDelete: (comment: ICommentEntity) => {
             dispatch(createDeleteCommentAction(comment.key));
-        },
-        commentInput: (name, content) => {
-            console.log(createAddCommentsAction({ name, content }));
-            dispatch(createAddCommentsAction({ name, content }));
         }
     };
 }
@@ -147,7 +144,9 @@ const MyCommentList = connect(
 )(CommentList);
 const MyCommentInput = connect(
     (state, ownProps) => state.commentApp,
-    mapDispatchToProps
+    {
+        commentInput: createAsyncAddCommentsAction
+    }
 )(CommentInput);
 
 

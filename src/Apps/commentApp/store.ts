@@ -43,6 +43,17 @@ export const createDeleteCommentAction = (key) => {
     }
 }
 
+export const createAsyncAddCommentsAction = (comment) => {
+    console.log(comment);
+    return (dispatch) => {
+        console.time('setTimeout');
+        setTimeout(() => {
+            console.timeEnd('setTimeout');
+            dispatch(createAddCommentsAction(comment))
+        }, 1000);
+    }
+}
+
 export {
     reducer
 }
