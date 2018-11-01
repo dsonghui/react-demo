@@ -1,9 +1,7 @@
 import * as React from 'react';
 import { Route, Switch } from 'react-router-dom';
-import AsyncComponent from "../components/AsyncComponent";
+import Home from "../pages/Home";
 
-const BallApp = AsyncComponent(() => import("../Apps/Ball/BallWrap"));
-const CommentApp = AsyncComponent(() => import("../Apps/commentApp"));
 
 
 export default class RouterMap extends React.Component {
@@ -12,8 +10,7 @@ export default class RouterMap extends React.Component {
     }
     public render() {
         return <Switch>
-            <Route path="/Ball" component={BallApp}/>
-            <Route path="/Comment" component={CommentApp}/>
+            <Route path="/Comment" component={Home}/>
         </Switch>
     }
 }
