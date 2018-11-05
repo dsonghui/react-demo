@@ -20,6 +20,7 @@
     "jest": "22.4.2",
     "mobx": "^5.5.2",
     "mobx-react": "^5.3.6",
+    "mobx-state-tree": "^3.7.1",
     "object-assign": "4.1.1",
     "postcss-flexbugs-fixes": "3.2.0",
     "postcss-loader": "2.0.8",
